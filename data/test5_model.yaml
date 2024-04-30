@@ -1,0 +1,63 @@
+- name: User
+  fields:
+    - name: id
+      type: int
+    - name: username
+      type: str
+    - name: email
+      type: str
+    - name: full_name
+      type: Optional[str]
+- name: Post
+  fields:
+    - name: id
+      type: int
+    - name: title
+      type: str
+    - name: content
+      type: str
+    - name: author_id
+      type: int
+- name: Comment
+  fields:
+    - name: id
+      type: int
+    - name: content
+      type: str
+    - name: author_id
+      type: int
+    - name: post_id
+      type: int
+  relationships:
+    - schema: many_to_one
+      target: User
+      attribute: author
+    - schema: one_to_one
+      target: Post
+      attribute: post
+- name: Like
+  fields:
+    - name: id
+      type: int
+    - name: user_id
+      type: int
+    - name: post_id
+      type: int
+- name: Tag
+  fields:
+    - name: id
+      type: int
+    - name: name
+      type: str
+- name: PostTag
+  fields:
+    - name: post_id
+      type: int
+    - name: tag_id
+      type: int
+- name: Friendship
+  fields:
+    - name: user_id
+      type: int
+    - name: friend_id
+      type: int

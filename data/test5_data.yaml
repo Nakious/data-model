@@ -1,0 +1,53 @@
+Users:
+  - id: 1
+    username: user1
+    email: user1@example.com
+    full_name: User One
+  - id: 2
+    username: user2
+    email: user2@example.com
+    full_name: User Two
+
+Posts:
+  - id: 1
+    title: Post Title 1
+    content: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    author_id: 1
+  - id: 2
+    title: Post Title 2
+    content: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+    author_id: 2
+
+Comments:
+  - id: 1
+    content: Great post!
+    author_id: 2
+    post_id: 1
+  - id: 2
+    content: I agree!
+    author_id: 1
+    post_id: 2
+
+Likes:
+  - id: 1
+    user_id: 1
+    post_id: 2
+  - id: 2
+    user_id: 2
+    post_id: 1
+
+Tags:
+  - id: 1
+    name: Python
+  - id: 2
+    name: Data Science
+
+PostTags:
+  - post_id: 1
+    tag_id: 1
+  - post_id: 2
+    tag_id: 2
+
+Friendships:
+  - user_id: 1
+    friend_id: 2

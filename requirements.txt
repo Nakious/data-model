@@ -1,2 +1,5 @@
 pyyaml
 graphviz
+pydantic
+typing
+typing_extensions
