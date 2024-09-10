@@ -3,6 +3,7 @@ from typing import Optional, List, ClassVar, Annotated, ForwardRef, get_args
 from graphviz import Digraph
 import yaml
 import inspect
+from icecream import ic
 
 # Dynamically generate classes
 def generate_pydantic_classes_from_yaml(yaml_file):
@@ -40,7 +41,9 @@ def generate_graphviz_schema(model_classes):
         dot.node(cls.__name__, cls.__name__)
 
     for _, cls in model_classes.items():
+        ic(cls)
         for field_name, field_info in cls.__fields__.items():
+            ic(cls.__fields__.items())
             if  (field_type := get_args(field_info.annotation)):
                 field_type = get_args(field_info.annotation)[0]
                 # print(get_args(field_info.annotation)[0])
@@ -71,6 +74,7 @@ def import_data_from_yaml(yaml_file, generated_classes):
 model_yaml_file = 'data/test5_model.yaml'
 generated_classes = generate_pydantic_classes_from_yaml(model_yaml_file)
 
+ic(generated_classes)
 # Print model schema example
 # print(generated_classes['Comment'].schema_json(indent=2))
 

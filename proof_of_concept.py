@@ -1,8 +1,9 @@
 import yaml
-from pydantic import BaseModel, ValidationError, field_validator
-from typing import List, Dict, Any
+from pydantic import BaseModel, ValidationError, field_validator, create_model
+from typing import List, Dict, Any, get_args
 import os
-#from icecream import ic
+from graphviz import Digraph
+from icecream import ic
 
 class ValidationError(Exception):
     """Custom error class to raise validation errors."""
@@ -175,6 +176,51 @@ def parse_schema(parsed_schema, parsed_data):
 
     return models
 
+
+def generate_pydantic_classes_from_yaml(yaml_file):
+
+    classes = {}
+
+    for item in yaml_file:
+        fields = {}
+        relationships = {}
+        class_name = item['name']
+
+        # Define fields
+        fields = {
+            field['name']: (field['type'], None) if str(field['type']).startswith('Optional') else (field['type'], ...) for field in item['fields']
+        }
+        if 'relationships' in item:
+            relationships = {relationship['attribute']: (List[classes[relationship['target']]], ...) if relationship['schema'] == 'many_to_one' else (classes[relationship['target']], ...) for relationship in item['relationships']}
+        fields.update(relationships)
+        classes[class_name] = create_model(class_name, **fields)
+
+    return classes
+
+
+
+def generate_graphviz_schema(model_classes):
+    """
+    Generates a Graphviz representation of the model schema.
+    """
+    dot = Digraph()
+
+    for _, cls in model_classes.items():
+        dot.node(cls.__name__, cls.__name__)
+
+    for _, cls in model_classes.items():
+        for field_name, field_info in cls.__fields__.items():
+            ic(cls.__fields__.items())
+            if  (field_type := get_args(field_info.annotation)):
+                field_type = get_args(field_info.annotation)[0]
+            else:
+                field_type = field_info.annotation
+            if issubclass(field_type, BaseModel):
+                dot.edge(cls.__name__, field_type.__name__, label=field_name)
+
+    dot.render('output/proof_of_concept', format='png', cleanup=True)
+
+
 def main():
     # File paths for the data.
     file_path_schema = 'data/model.yaml'  # The model schema YAML file
@@ -186,6 +232,9 @@ def main():
     # Parse the schema to get the class names, attributes, and relationships
     
     models = parse_schema(parsed_schema=parsed_schema, parsed_data=parsed_data)
+
+    generated_classes = generate_pydantic_classes_from_yaml(parsed_schema)
+    generate_graphviz_schema(generated_classes)
 
     validated_instances = {} # To store validated instances
     invalidated_instances = {}  # To store invalidated instances
@@ -208,14 +257,14 @@ def main():
 
 
     # Print the valid instances
-    print(f"Instances that PASSED validation: \n")
+    print(f"\nInstances that PASSED validation:")
     for class_name, class_instances in validated_instances.items():
         print(f"Instances for {class_name}:")
         for instance in class_instances:
             print(instance)
     
     # Print the invalid instances
-    print(f"Instances that FAILED validation: \n")
+    print(f"\nInstances that FAILED validation:")
     for class_name, class_instances in invalidated_instances.items():
         print(f"Instances for {class_name}:")
         for instance in class_instances:
