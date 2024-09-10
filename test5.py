@@ -10,11 +10,16 @@ def generate_pydantic_classes_from_yaml(yaml_file):
         model_data = yaml.safe_load(file)
 
     classes = {}
+
     for item in model_data:
         fields = {}
         relationships = {}
         class_name = item['name']
-        fields = {field['name']: (field['type'], None) if str(field['type']).startswith('Optional') else (field['type'], ...) for field in item['fields']}
+
+        # Define fields
+        fields = {
+            field['name']: (field['type'], None) if str(field['type']).startswith('Optional') else (field['type'], ...) for field in item['fields']
+        }
         if 'relationships' in item:
             relationships = {relationship['attribute']: (List[classes[relationship['target']]], ...) if relationship['schema'] == 'many_to_one' else (classes[relationship['target']], ...) for relationship in item['relationships']}
         fields.update(relationships)
